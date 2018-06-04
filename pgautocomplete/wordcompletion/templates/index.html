@@ -15,7 +15,7 @@
 	<!-- meta character set -->
 	<meta charset="UTF-8">
 	<!-- Site Title -->
-	<title>CellOn</title>
+	<title>PG-Trigram Demo</title>
 
 	<link href="https://fonts.googleapis.com/css?family=Poppins:100,300,500" rel="stylesheet">
 		<!--
@@ -28,6 +28,16 @@
         <link rel="stylesheet" href='{% static "wordcompletion/css/magnific-popup.css" %}'>
         <link rel="stylesheet" href='{% static "wordcompletion/css/bootstrap.css" %}'>
         <link rel="stylesheet" href='{% static "wordcompletion/css/main.css" %}'>
+
+        <style>
+            .autocomplete-suggestions { border: 1px solid #999; background: #FFF; overflow: auto; }
+            .autocomplete-suggestion { padding: 2px 5px; white-space: nowrap; overflow: hidden; }
+            .autocomplete-selected { background: #F0F0F0; }
+            .autocomplete-suggestions strong { font-weight: normal; color: #3399FF; }
+            .autocomplete-group { padding: 2px 5px; }
+            .autocomplete-group strong { display: block; border-bottom: 1px solid #000; }
+        </style>
+
 	</head>
 	<body>
 	<div class="oz-body-wrap">
@@ -66,11 +76,12 @@
 							There is a <span class="sp-2">Cactus</span></h1>
                             <form style="padding-top:10px;">
                               <div class="form-group">
+                                <div class="input-group input-group-sm mb-3">
+                                    <input type="text" class="form-control incoming" aria-label="Small" placeholder="incoming center" aria-describedby="inputGroup-sizing-sm">
+                                </div>
+
                                   <div class="input-group input-group-sm mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="inputGroup-sizing-sm">Type Free Text</span>
-                                    </div>
-                                    <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+                                    <input type="text" class="form-control" aria-label="Small" placeholder="type to search" aria-describedby="inputGroup-sizing-sm" id="autocomplete">
                                   </div>
                               </div>
                             </form>
@@ -93,5 +104,31 @@
         <script src='{% static "wordcompletion/js/jquery.counterup.min.js" %}'></script>
         <script src='{% static "wordcompletion/js/waypoints.min.js" %}'></script>
         <script src='{% static "wordcompletion/js/main.js" %}'></script>
+        <script src='{% static "wordcompletion/js/vendor/jquery.autocomplete.js" %}'></script>
+
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $('#autocomplete').autocomplete({
+                    lookup: function (query, done) {
+                        var incoming = $(".incoming").val();
+                        var url = '/poc/autocomplete/?query=' + query;
+                        if(incoming){
+                            url = url + "&incoming_center=" + incoming;
+                        }
+                        $.ajax({
+                            url: url,
+                            success: function(resp){
+                                result = {"suggestions": resp}
+                                done(result);
+                            }
+                        
+                        })
+                    },
+                    onSelect: function (suggestion) {
+                            alert('You selected: ' + suggestion.value + ', ' + JSON.stringify(suggestion.data));
+                        }
+                    })
+            })
+        </script>
 	</body>
 </html>
